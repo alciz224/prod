@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{% block title %}My Django Project{% endblock title %}</title>
+        <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+	<!-- CSS files -->
+	{% block extra_css %}
+	<!-- Place for additional CSS files in child templates -->
+	{% endblock extra_css %}
+</head>
+
+<body>
+
+	<main>
+		{% block content %}
+		<!-- Main content will be inserted here -->
+		{% endblock content %}
+	</main>
+		<button hx-get={% url "home" %} hx-swap="outerHTML">Click Me</button>
+
+	<footer>
+		<!-- Footer content -->
+		<p>&copy; 2024 My Django Project. All rights reserved.</p>
+	</footer>
+
+	<!-- JavaScript files -->
+	{% block extra_js %}
+	<!-- Place for additional JS files in child templates -->
+	{% endblock extra_js %}
+</body>
+
+</html>
