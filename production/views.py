@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from . models import Album, Post, Event, Reaction, Comment, Reaction, Artist, Track
+from django.contrib.contenttypes.models import ContentType
 from . serializers import ArtistSerializer, CommentSerializer, EventSerializer, LikeSerializer, PostSerializer, AlbumSerializer, TrackSerializer
 from . permissions import ReadOnlyOrAthorPerm
 
@@ -15,7 +16,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
-
+    
+    def list(self, request, *args, **kwargs):
+        response=super().list(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            content_type=ContentType.objects.get(model="post", app_label="production")
+            liked_posts=Reaction.objects.filter(user=request.user, content_type=content_type)
+            response.data["liked_posts"]=liked_posts.values()
+        return response
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class=EventSerializer
@@ -42,6 +50,7 @@ class LikeToggleView(viewsets.ModelViewSet):
     queryset=Reaction.objects.all()
     permission_classes = [ReadOnlyOrAthorPerm]
 
+"""
     def create(self, request, *args, **kwargs):
         serializer=self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -59,7 +68,7 @@ class LikeToggleView(viewsets.ModelViewSet):
             like.delete()
             return Response({"detail":"Like removed successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+"""
 #-----------ARTIST VIEWS --------
 class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class=ArtistSerializer

@@ -1,4 +1,3 @@
-from django.core.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
@@ -6,7 +5,7 @@ class ReadOnlyOrAthorPerm(BasePermission):
 
     """
     Custom permission to allow anonymous users to read only,
-    and authenticated users to create and update/delete if they are the author.
+    and authenticated users to create and update/delete if they are the author. 
     """
 
     def has_permission(self, request, view):

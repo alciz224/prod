@@ -62,7 +62,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class LikeSerializer(serializers.ModelSerializer):
     user=serializers.ReadOnlyField(source='user.username')
-    content_type=serializers.PrimaryKeyRelatedField(queryset=ContentType.objects.filter(model__in=["post","event","comment"]))
     class Meta:
         model=Reaction
         fields="__all__"

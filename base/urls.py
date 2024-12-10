@@ -16,23 +16,24 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
-
 from django.contrib import admin
 from django.urls import include, path
-
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from . import views
-
+from .views import LogoutView
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('api/token/',
-         TokenObtainPairView.as_view(),
-         name='token_obtain_pair'),
+         TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path('api/token/refresh/',
          TokenRefreshView.as_view(),
          name='token_refresh'),
+    path('api/logout/',
+         LogoutView.as_view(),
+         name='logout'),
     path('api/', include('production.urls')),
     path('api/', include('vote.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
