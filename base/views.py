@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from production.models import Reaction
+from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
+
 from rest_framework.response import Response
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
+
 
 def home(request):
     reactions=Reaction.objects.first()
@@ -16,7 +16,17 @@ def home(request):
 
     return render(request, 'base.html')
 
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        refresh = response.data.get('refresh')
+        access = response.data.get('access')
 
+        # Set cookies for tokens
+        response.set_cookie('access', access, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('refresh', refresh, httponly=True, secure=True, samesite='Lax')
+
+        return response
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 

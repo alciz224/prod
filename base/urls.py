@@ -20,13 +20,13 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from . import views
-from .views import LogoutView
+from .views import LogoutView, CookieTokenObtainPairView
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('api/token/',
-         TokenObtainPairView.as_view(), name="token_obtain_pair"),
+         CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path('api/token/refresh/',
          TokenRefreshView.as_view(),
          name='token_refresh'),

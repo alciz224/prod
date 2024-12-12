@@ -1,5 +1,6 @@
 
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from . models import Album, Post, Event, Reaction, Comment, Reaction, Artist, Track
@@ -11,7 +12,7 @@ from . permissions import ReadOnlyOrAthorPerm
 class PostViewSet(viewsets.ModelViewSet):
     queryset=Post.objects.all()
     serializer_class=PostSerializer
-    permission_classes=[ReadOnlyOrAthorPerm]
+    permission_classes=[IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -50,7 +51,7 @@ class LikeToggleView(viewsets.ModelViewSet):
     queryset=Reaction.objects.all()
     permission_classes = [ReadOnlyOrAthorPerm]
 
-"""
+
     def create(self, request, *args, **kwargs):
         serializer=self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -68,7 +69,7 @@ class LikeToggleView(viewsets.ModelViewSet):
             like.delete()
             return Response({"detail":"Like removed successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-"""
+
 #-----------ARTIST VIEWS --------
 class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class=ArtistSerializer
