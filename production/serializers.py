@@ -42,22 +42,30 @@ class TrackSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    comments=serializers.SerializerMethodField()
+    content_type=serializers.PrimaryKeyRelatedField(queryset=ContentType.objects.filter(model__in=["post","event"]), allow_null=True, required=False)
+    replies=serializers.SerializerMethodField()
     likes=serializers.SerializerMethodField()
     user=serializers.ReadOnlyField(source='user.username')
     #    content_type=serializers.ModelField(source='content_type.model', model_field='content_type__model')  
     class Meta:
         model = Comment
-        fields = ["id", "text", "content_type", "object_id", "parent", "user","comments", "user", "likes"]
+        fields = ["id", "text", "content_type", "object_id", "parent", "user","replies", "user", "likes"]
         #['id', 'text', 'content_type', 'created_at', 'user', 'object_id', 'content_object', 'comments', 'likes']
 
-    def get_comments(self, obj):
-        child_comments=obj.comments.count()
+    def get_replies(self, obj):
+        ob=Comment.objects.get(pk=obj.id)
+
+        child_comments=ob.replies.count()
         return child_comments
 
     def get_likes(self, obj):
         comment_likes=obj.likes.count()
         return comment_likes
+    
+    def validate_parent(self, value):
+        if value and value.parent:
+            raise serializers.ValidationError("reponse imbriqué non permise")
+
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -115,9 +123,7 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "content", "user", "photo", "created_at", "comments", "likes")
 
     def get_comments(self, obj):
-
         main_comments = obj.comments.count()
-    
         return main_comments
 
     def get_likes(self, obj):

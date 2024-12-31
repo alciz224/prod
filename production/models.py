@@ -195,9 +195,11 @@ class Comment(models.Model):
 
     def __str__(self):
         if self.parent:
-            return f"@{self.user} replied a comment: {self.text[0:10]}...({self.content_type})"
+            return f"@{self.user} replied a comment: {self.text[0:10]}..."
         
-        return f"@{self.user} commented {self.content_type.model}: {self.text[0:10]}{'...' if len(self.text) > 10 else None}"
+        if self.content_type:
+            return f"@{self.user} commented {self.content_type.model}: {self.text[0:10]}{'...' if len(self.text) > 10 else None}"
+        return f"Comment object with id {self.id}"
 
 
 

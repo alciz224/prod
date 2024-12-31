@@ -1,8 +1,14 @@
 
+from re import search
+from django.http.request import is_same_domain
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+
+from production.filters import EventFilter, PostFilter
 from . models import Album, Post, Event, Reaction, Comment, Reaction, Artist, Track
 from django.contrib.contenttypes.models import ContentType
 from . serializers import ArtistSerializer, CommentSerializer, EventSerializer, LikeSerializer, PostSerializer, AlbumSerializer, TrackSerializer
@@ -12,7 +18,10 @@ from . permissions import ReadOnlyOrAthorPerm
 class PostViewSet(viewsets.ModelViewSet):
     queryset=Post.objects.all()
     serializer_class=PostSerializer
-    permission_classes=[IsAuthenticated]
+    permission_classes=[ReadOnlyOrAthorPerm]
+    filter_backends=[DjangoFilterBackend, SearchFilter]
+    filterset_class=PostFilter
+    search_fields=["title", "content", "user__username"]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -30,6 +39,9 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class=EventSerializer
     queryset=Event.objects.all()
     permission_classes=[ReadOnlyOrAthorPerm]
+    filter_backends=[DjangoFilterBackend, SearchFilter]
+    filterset_class=EventFilter
+    search_fields=["name", "description", "category", "place"]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -74,7 +86,7 @@ class LikeToggleView(viewsets.ModelViewSet):
 class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class=ArtistSerializer
     queryset=Artist.objects.all()
-    permission_classes=[ReadOnlyOrAthorPerm]
+    permission_classes=[AllowAny]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

@@ -18,21 +18,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from .views import CookieTokenRefreshView, CookieTokenObtainPairView, LogoutAndBlacklistRefreshTokenForUserView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
-from . import views
-from .views import LogoutView, CookieTokenObtainPairView
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('admin/', admin.site.urls),
-    path('api/token/',
-         CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path('api/token/refresh/',
-         TokenRefreshView.as_view(),
-         name='token_refresh'),
-    path('api/logout/',
-         LogoutView.as_view(),
-         name='logout'),
+    path('api/admin/', admin.site.urls),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/logout/', LogoutAndBlacklistRefreshTokenForUserView.as_view(), name='api_logout'),
     path('api/', include('production.urls')),
     path('api/', include('vote.urls')),
 
